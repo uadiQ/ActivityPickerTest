@@ -14,7 +14,7 @@ class ActivityPickerViewController: UIViewController {
     
     var viewModel: ActivityPickerViewModelType!
     var mediator: ActivityPickerMediator!
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         viewModel = ActivityPickerViewModel()
@@ -23,7 +23,19 @@ class ActivityPickerViewController: UIViewController {
         
         collectionView.dataSource = mediator
         collectionView.delegate = mediator
+        setupViewModelBlocks()
     }
     
+    private func setupViewModelBlocks() {
+        viewModel.dataSourceUpdated = {[weak self] in
+            self?.collectionView.reloadData()
+        }
+        
+        viewModel.rollBackTo = { [weak self] indexPath in
+            self?.collectionView.scrollToItem(at: indexPath,
+                                              at: .centeredHorizontally,
+                                              animated: true)
+        }
+    }
     
 }

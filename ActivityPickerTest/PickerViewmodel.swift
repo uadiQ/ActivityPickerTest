@@ -15,6 +15,9 @@ protocol PickerViewModel: class {
 protocol ActivityPickerViewModelType: PickerViewModel {
     func numberOfItemsInSection(_ section: Int) -> Int
     func setupCell(_ cell: ActivityCollectionViewCell, indexPath: IndexPath)
+    func processSelection(at indexPath: IndexPath)
+    var dataSourceUpdated: (() -> Void)? { get set }
+    var rollBackTo: ((IndexPath) -> Void)? { get set }
 }
 
 enum IndexPathType {
@@ -25,6 +28,8 @@ enum IndexPathType {
 
 class ActivityPickerViewModel: ActivityPickerViewModelType {
     
+    var rollBackTo: ((IndexPath) -> Void)?
+    var dataSourceUpdated: (() -> Void)?
     var selectedActivity: Activity?
     var isSubselecting: Bool = false
     var rootActivities = [Activity]() //should be fetched onced at viewModel creation
@@ -170,4 +175,8 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
         }
     }
     
+    func processSelection(at indexPath: IndexPath) {
+        
+    }
+
 }
