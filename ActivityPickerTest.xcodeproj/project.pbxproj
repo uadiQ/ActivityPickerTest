@@ -63,11 +63,11 @@
 			isa = PBXGroup;
 			children = (
 				48B4F4992188A4EE006EEF3E /* AppDelegate.swift */,
-				48B4F4AB2188A568006EEF3E /* ActivityPickerViewController.swift */,
-				48B4F4AD2188A586006EEF3E /* PickerViewmodel.swift */,
-				48B4F4AF2188A748006EEF3E /* PickerMediator.swift */,
 				48B4F4B12188B322006EEF3E /* Activity.swift */,
 				48B4F4B32188B676006EEF3E /* ActivityCollectionViewCell.swift */,
+				48B4F4AB2188A568006EEF3E /* ActivityPickerViewController.swift */,
+				48B4F4AF2188A748006EEF3E /* PickerMediator.swift */,
+				48B4F4AD2188A586006EEF3E /* PickerViewmodel.swift */,
 				48B4F49D2188A4EE006EEF3E /* Main.storyboard */,
 				48B4F4A02188A4F1006EEF3E /* Assets.xcassets */,
 				48B4F4A22188A4F1006EEF3E /* LaunchScreen.storyboard */,

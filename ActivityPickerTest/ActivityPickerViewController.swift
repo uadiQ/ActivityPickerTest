@@ -22,8 +22,9 @@ class ActivityPickerViewController: UIViewController {
                                           collection: collectionView)
         
         collectionView.dataSource = mediator
-        collectionView.delegate  = mediator
-        
+        collectionView.delegate = mediator
+        collectionView.register(ActivityCollectionViewCell.nib,
+                                forCellWithReuseIdentifier: ActivityCollectionViewCell.reuseID)
     }
     
     

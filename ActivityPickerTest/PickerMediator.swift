@@ -34,10 +34,12 @@ extension ActivityPickerMediator: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ActivityCollectionViewCell.reuseID, for: indexPath) as? ActivityCollectionViewCell else {
+            fatalError("wrong cell id")
+        }
         
-        
-        
-        return UICollectionViewCell()
+        viewModel.setupCell(cell, indexPath: indexPath)
+        return cell
     }
     
 }

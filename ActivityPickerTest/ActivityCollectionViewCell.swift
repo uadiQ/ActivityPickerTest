@@ -16,6 +16,12 @@ enum ActivityCellState {
 
 class ActivityCollectionViewCell: UICollectionViewCell {
     
+    static let reuseID = String(describing: ActivityCollectionViewCell.self)
+    static let nib = UINib(nibName: String(describing: ActivityCollectionViewCell.self),
+                           bundle: nil)
+    
+    
+    
     @IBOutlet weak var cellView: UIView!
     @IBOutlet weak var cellLabel: UILabel!
     
