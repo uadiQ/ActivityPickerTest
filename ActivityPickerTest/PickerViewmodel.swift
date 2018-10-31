@@ -48,13 +48,15 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
         let twenty = Activity(name: "11 - 20", id: "twenty", sortPrio: 1)
         let thirty = Activity(name: "21 - 30", id: "thirty", sortPrio: 2)
         let fourty = Activity(name: "31 - 40", id: "fourty", sortPrio: 3)
+        let fifty = Activity(name: "41 - 50", id: "fifty", sortPrio: 3)
+        let sixty = Activity(name: "51 - 60", id: "sixty", sortPrio: 3)
         
         let eleven = Activity(name: "11", id: "eleven", sortPrio: 0, isRoot: false)
         let twelve = Activity(name: "12", id: "twelve", sortPrio: 1, isRoot: false)
         ten.addChild(eleven)
         ten.addChild(twelve)
         
-        return [ten, twenty, thirty, fourty, eleven, twelve]
+        return [ten, twenty, thirty, fourty, fifty, sixty, eleven, twelve]
     }
     
     private func fetchRootActivities() {
