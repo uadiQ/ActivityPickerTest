@@ -20,10 +20,15 @@ class ActivityCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var cellLabel: UILabel!
     
     var state: ActivityCellState = .none
+    var isDoor: Bool = false
     
     override func awakeFromNib() {
         super.awakeFromNib()
         setState(state)
+    }
+    
+    func setDoorState(_ isDoor: Bool) {
+        self.isDoor = isDoor
     }
     
     func setState(_ activityState: ActivityCellState) {
@@ -38,7 +43,7 @@ class ActivityCollectionViewCell: UICollectionViewCell {
             colorForView = .blue
             
         default:
-            colorForView = .lightGray
+            colorForView = .purple
         }
         cellView.backgroundColor = colorForView
     }
@@ -48,10 +53,13 @@ class ActivityCollectionViewCell: UICollectionViewCell {
     }
     
     override var isSelected: Bool {
-       didSet {
-//        if isSelected {
-//            self.setState(ActivityCellState.selected)
-//        }
+        didSet {
+            if isSelected {
+                self.setState(ActivityCellState.selected)
+            } else {
+                let state = isDoor ? ActivityCellState.door : ActivityCellState.none
+                self.setState(state)
+            }
         }
     }
     
