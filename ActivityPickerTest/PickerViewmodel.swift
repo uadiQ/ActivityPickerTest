@@ -122,7 +122,7 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
             let activityChildren = childrenOf(activity: activity)
             
             guard adjustedActivityIndex >= 0 && adjustedActivityIndex < activityChildren.count else {
-                debugPrint("Index out of array boundaries")
+                debugPrint("Index is out of array boundaries")
                 return
             }
             
@@ -135,16 +135,29 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
     
     private func setupRootCell(_ cell: ActivityCollectionViewCell, indexPath: IndexPath) {
         let cellType = indexPathType(with: indexPath)
+        var cellText = ""
+        
         switch cellType {
         case .add:
             print("setting up add cell")
+            cellText = "Add"
             
         case .regular:
             print("setting up regular cell")
+            let adjustedActivityIndex = indexPath.item - 1
+            
+            guard adjustedActivityIndex >= 0 && adjustedActivityIndex < rootActivities.count else {
+                debugPrint("Index is out of array boundaries")
+                return
+            }
+            let cellActivity = rootActivities[adjustedActivityIndex]
+            cellText = cellActivity.name
             
         case .door:
             fatalError("wrong type of cell for level")
         }
+        
+        cell.setup(text: cellText)
     }
     
     func setupCell(_ cell: ActivityCollectionViewCell, indexPath: IndexPath) {
@@ -153,7 +166,6 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
         } else {
             setupRootCell(cell, indexPath: indexPath)
         }
-        
     }
     
 }
