@@ -32,6 +32,7 @@ class ActivityPickerViewController: UIViewController {
         }
         
         viewModel.rollBackTo = { [weak self] indexPath in
+            self?.collectionView.reloadData()
             self?.collectionView.scrollToItem(at: indexPath,
                                               at: .centeredHorizontally,
                                               animated: true)
