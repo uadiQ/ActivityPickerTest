@@ -24,6 +24,7 @@ class ActivityPickerViewController: UIViewController {
         collectionView.dataSource = mediator
         collectionView.delegate = mediator
         setupViewModelBlocks()
+        mediator.setupViewModelBlocks()
     }
     
     private func setupViewModelBlocks() {

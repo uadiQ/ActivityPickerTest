@@ -18,6 +18,7 @@ protocol ActivityPickerViewModelType: PickerViewModel {
     func processSelection(at indexPath: IndexPath)
     var dataSourceUpdated: (() -> Void)? { get set }
     var rollBackTo: ((IndexPath) -> Void)? { get set }
+    var activitySelected: ((Activity?) -> Void)? { get set }
 }
 
 enum IndexPathType {
@@ -30,12 +31,15 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
     
     var rollBackTo: ((IndexPath) -> Void)?
     var dataSourceUpdated: (() -> Void)?
-    var selectedActivity: Activity?
+    var activitySelected: ((Activity?) -> Void)?
+    
+    var selectedRootActivity: Activity?
+    var currentlySelectedActivity: Activity?
     var isSubselecting: Bool = false
     var rootActivities = [Activity]() //should be fetched onced at viewModel creation
     var currentActivities: [Activity] { // to store activities that shoud be displayed ATM
         if self.isSubselecting {
-            guard let activity = selectedActivity else {
+            guard let activity = selectedRootActivity else {
                 return []
             }
             return childrenOf(activity: activity)
@@ -107,7 +111,7 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
         let cellType = indexPathType(with: indexPath)
         var cellText = ""
         
-        guard let activity = selectedActivity else {
+        guard let activity = selectedRootActivity else {
             debugPrint("No root activity")
             return
         }
@@ -176,6 +180,53 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
     }
     
     func processSelection(at indexPath: IndexPath) {
+        if isSubselecting {
+            processSubselectingClick(at: indexPath)
+        } else {
+            processUpperLevelClick(at: indexPath)
+            }
+    }
+    
+    private func popToUpperLevel() {
+        guard let selectedActivity = selectedRootActivity else {
+            debugPrint("App can't be in subselect without root activity")
+            return
+        }
+        let arrayIndex = rootActivities.firstIndex { activity -> Bool in
+            selectedActivity.id == activity.id
+        }
+        guard let neededIndex = arrayIndex else {
+            debugPrint("No such activity in root activities")
+            return
+        }
+        let popUpIndex = neededIndex + 1
+        let popUpIndexPath = IndexPath(item: popUpIndex, section: 0)
+        isSubselecting = false
+        rollBackTo?(popUpIndexPath)
+    }
+    
+    private func addClicked() {
+        
+    }
+    
+    private func processSubselectingClick(at indexPath: IndexPath) {
+        guard indexPath.item != 0 else { // door clicked, going back to upper level
+            popToUpperLevel()
+            return
+        }
+        
+        guard indexPath.item != currentActivities.count + 1 else { // add clicked, process
+            addClicked()
+            return
+        }
+        
+        let adjustedItemIndex = indexPath.item - 1
+        currentlySelectedActivity = currentActivities[adjustedItemIndex]
+        activitySelected?(currentlySelectedActivity)
+        
+    }
+    
+    private func processUpperLevelClick(at indexPath: IndexPath) {
         
     }
 

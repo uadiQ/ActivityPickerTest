@@ -17,12 +17,20 @@ protocol ActivityPickerMediatorType: PickerMediator {
 }
 
 class ActivityPickerMediator: NSObject, ActivityPickerMediatorType {
-    var viewModel: ActivityPickerViewModelType
+    
+    let viewModel: ActivityPickerViewModelType
     let collectionView: UICollectionView
+    var selectedIndex: IndexPath?
     
     init(viewModel: ActivityPickerViewModelType, collection: UICollectionView) {
         self.viewModel = viewModel
         self.collectionView = collection
+    }
+    
+    func setupViewModelBlocks() {
+        viewModel.dataSourceUpdated = { [weak self] in
+            self?.selectedIndex = nil
+        }
     }
 }
 
@@ -46,6 +54,32 @@ extension ActivityPickerMediator: UICollectionViewDataSource {
 
 extension ActivityPickerMediator: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        //processing visual part of cell selection
+        guard let cell = collectionView.cellForItem(at: indexPath) as? ActivityCollectionViewCell else {
+            return
+        }
         
+        if let currentSelection = selectedIndex,
+            currentSelection == indexPath {
+            
+            selectedIndex = nil
+            collectionView.deselectItem(at: indexPath, animated: true)
+            cell.setState(ActivityCellState.none)
+            
+        } else {
+            if let prevSelection = selectedIndex,
+                let prevCell = collectionView.cellForItem(at: prevSelection) as? ActivityCollectionViewCell {
+                prevCell.setState(ActivityCellState.none)
+            }
+            
+            selectedIndex = indexPath
+            cell.setState(ActivityCellState.selected)
+            
+        }
+        
+        //calling viewmodel to do selection logic
+        viewModel.processSelection(at: indexPath)
     }
+    
+    
 }
