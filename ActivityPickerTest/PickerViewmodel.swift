@@ -41,13 +41,13 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
     var rootActivities = [Activity]() //should be fetched onced at viewModel creation
     var currentActivities: [Activity] {
         get {// to store activities that shoud be displayed ATM
-        if self.isSubselecting {
-            guard let activity = selectedRootActivity else {
-                return []
-            }
-            return childrenOf(activity: activity)
-        } else {
-            return rootActivities
+            if self.isSubselecting {
+                guard let activity = selectedRootActivity else {
+                    return []
+                }
+                return childrenOf(activity: activity)
+            } else {
+                return rootActivities
             }
         }
         set {
@@ -59,6 +59,7 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
         fetchRootActivities()
     }
     
+    // only for current testcase
     private func generateMockup() -> [Activity] {
         let ten = Activity(name: "0 - 10", id: "ten", sortPrio: 0)
         let twenty = Activity(name: "11 - 20", id: "twenty", sortPrio: 1)
@@ -77,6 +78,7 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
         return [ten, twenty, thirty, fourty, fifty, sixty, eleven, twelve]
     }
     
+    // MARK: - Activities fetching(root and children)
     private func fetchRootActivities() {
         let allActivities = generateMockup()
         for item in allActivities {
@@ -91,11 +93,29 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
         return activity.children.sorted(by: { $0.sortingPriority < $1.sortingPriority })
     }
     
+    //MARK: - Mediator called methods
     func numberOfItemsInSection(_ section: Int) -> Int {
         let additionalCells = isSubselecting ? 2 : 1 // for root one and "add"
         return currentActivities.count + additionalCells
     }
     
+    func setupCell(_ cell: ActivityCollectionViewCell, indexPath: IndexPath) {
+        if isSubselecting {
+            setupSubselectionCell(cell, indexPath: indexPath)
+        } else {
+            setupRootCell(cell, indexPath: indexPath)
+        }
+    }
+    
+    func processSelection(at indexPath: IndexPath) {
+        if isSubselecting {
+            processSubselectingClick(at: indexPath)
+        } else {
+            processUpperLevelClick(at: indexPath)
+        }
+    }
+    
+    // MARK: - Private methods for collectionView support
     private func indexPathType(with indexPath: IndexPath) -> IndexPathType {
         if isSubselecting {
             switch indexPath.item {
@@ -114,6 +134,31 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
                 return IndexPathType.regular
             }
         }
+    }
+    
+    private func popToUpperLevel() {
+        guard let selectedActivity = selectedRootActivity else {
+            debugPrint("App can't be in subselect without root activity")
+            return
+        }
+        let arrayIndex = rootActivities.firstIndex { activity -> Bool in
+            selectedActivity.id == activity.id
+        }
+        guard let neededIndex = arrayIndex else {
+            debugPrint("No such activity in root activities")
+            return
+        }
+        let popUpIndex = neededIndex + 1
+        let popUpIndexPath = IndexPath(item: popUpIndex, section: 0)
+        currentlySelectedActivity = nil
+        isSubselecting = false
+        activitySelected?(nil)
+        rollBackTo?(popUpIndexPath)
+    }
+    
+    private func addClicked() {
+        print("going to add screen")
+        addPressed?()
     }
     
     private func setupSubselectionCell(_ cell: ActivityCollectionViewCell, indexPath: IndexPath) {
@@ -180,47 +225,6 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
         cell.setup(text: cellText)
     }
     
-    func setupCell(_ cell: ActivityCollectionViewCell, indexPath: IndexPath) {
-        if isSubselecting {
-            setupSubselectionCell(cell, indexPath: indexPath)
-        } else {
-            setupRootCell(cell, indexPath: indexPath)
-        }
-    }
-    
-    func processSelection(at indexPath: IndexPath) {
-        if isSubselecting {
-            processSubselectingClick(at: indexPath)
-        } else {
-            processUpperLevelClick(at: indexPath)
-            }
-    }
-    
-    private func popToUpperLevel() {
-        guard let selectedActivity = selectedRootActivity else {
-            debugPrint("App can't be in subselect without root activity")
-            return
-        }
-        let arrayIndex = rootActivities.firstIndex { activity -> Bool in
-            selectedActivity.id == activity.id
-        }
-        guard let neededIndex = arrayIndex else {
-            debugPrint("No such activity in root activities")
-            return
-        }
-        let popUpIndex = neededIndex + 1
-        let popUpIndexPath = IndexPath(item: popUpIndex, section: 0)
-        currentlySelectedActivity = nil
-        isSubselecting = false
-        activitySelected?(nil)
-        rollBackTo?(popUpIndexPath)
-    }
-    
-    private func addClicked() {
-        print("going to add screen")
-        addPressed?()
-    }
-    
     private func processSubselectingClick(at indexPath: IndexPath) {
         guard indexPath.item != 0 else { // door clicked, going back to upper level
             popToUpperLevel()
@@ -235,7 +239,6 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
         let adjustedItemIndex = indexPath.item - 1
         currentlySelectedActivity = currentActivities[adjustedItemIndex]
         activitySelected?(currentlySelectedActivity)
-        
     }
     
     private func processUpperLevelClick(at indexPath: IndexPath) {
@@ -257,6 +260,5 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
         selectedRootActivity = itemForIndex
         isSubselecting = true
         currentActivities = itemChildActivites
-
     }
 }

@@ -8,15 +8,7 @@
 
 import UIKit
 
-protocol PickerMediator: class {
-    
-}
-
-protocol ActivityPickerMediatorType: PickerMediator {
-    
-}
-
-class ActivityPickerMediator: NSObject, ActivityPickerMediatorType {
+class ActivityPickerMediator: NSObject {
     
     let viewModel: ActivityPickerViewModelType
     let collectionView: UICollectionView
