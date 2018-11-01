@@ -30,6 +30,8 @@ class ActivityPickerMediator: NSObject, ActivityPickerMediatorType {
     func setupViewModelBlocks() {
         viewModel.dataSourceUpdated = { [weak self] in
             self?.selectedIndex = nil
+            self?.collectionView.reloadSections(IndexSet(arrayLiteral: 0))
+            self?.collectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .left, animated: true)
         }
     }
 }
@@ -80,6 +82,4 @@ extension ActivityPickerMediator: UICollectionViewDelegate {
         //calling viewmodel to do selection logic
         viewModel.processSelection(at: indexPath)
     }
-    
-    
 }

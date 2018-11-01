@@ -25,7 +25,10 @@ class ActivityCollectionViewCell: UICollectionViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         cellView.backgroundColor = .purple
-//        setState(state)
+    }
+    
+    override func prepareForReuse() {
+        setState(.none)
     }
     
     func setDoorState(_ isDoor: Bool) {
@@ -51,24 +54,6 @@ class ActivityCollectionViewCell: UICollectionViewCell {
     
     func setup(text: String) {
         cellLabel.text = text
-    }
-    
-    override var isSelected: Bool {
-        didSet {
-//            switch isSelected {
-//            case true:
-//                let newState: ActivityCellState = (state == .selected) ? .none : .selected
-//                self.setState(newState)
-//            case false:
-//                let newState: ActivityCellState = isDoor ? .door : .none
-//                self.setState(newState)
-//            }
-            
-//            if !isSelected {
-//                let newState: ActivityCellState = isDoor ? .door : .none
-//                self.setState(newState)
-//            }
-        }
     }
     
 }

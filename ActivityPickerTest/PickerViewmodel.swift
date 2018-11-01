@@ -19,6 +19,7 @@ protocol ActivityPickerViewModelType: PickerViewModel {
     var dataSourceUpdated: (() -> Void)? { get set }
     var rollBackTo: ((IndexPath) -> Void)? { get set }
     var activitySelected: ((Activity?) -> Void)? { get set }
+    var addPressed: (() -> Void)? { get set }
 }
 
 enum IndexPathType {
@@ -32,12 +33,14 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
     var rollBackTo: ((IndexPath) -> Void)?
     var dataSourceUpdated: (() -> Void)?
     var activitySelected: ((Activity?) -> Void)?
+    var addPressed: (() -> Void)?
     
     var selectedRootActivity: Activity?
     var currentlySelectedActivity: Activity?
     var isSubselecting: Bool = false
     var rootActivities = [Activity]() //should be fetched onced at viewModel creation
-    var currentActivities: [Activity] { // to store activities that shoud be displayed ATM
+    var currentActivities: [Activity] {
+        get {// to store activities that shoud be displayed ATM
         if self.isSubselecting {
             guard let activity = selectedRootActivity else {
                 return []
@@ -45,6 +48,10 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
             return childrenOf(activity: activity)
         } else {
             return rootActivities
+            }
+        }
+        set {
+            dataSourceUpdated?()
         }
     }
     
@@ -62,6 +69,8 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
         
         let eleven = Activity(name: "11", id: "eleven", sortPrio: 0, isRoot: false)
         let twelve = Activity(name: "12", id: "twelve", sortPrio: 1, isRoot: false)
+        let thirtyfour = Activity(name: "34", id: "thirtyfour", sortPrio: 1, isRoot: false)
+        fourty.addChild(thirtyfour)
         ten.addChild(eleven)
         ten.addChild(twelve)
         
@@ -92,7 +101,7 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
             switch indexPath.item {
             case 0:
                 return IndexPathType.door
-            case numberOfItemsInSection(indexPath.section):
+            case numberOfItemsInSection(indexPath.section) - 1:
                 return IndexPathType.add
             default:
                 return IndexPathType.regular
@@ -201,12 +210,15 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
         }
         let popUpIndex = neededIndex + 1
         let popUpIndexPath = IndexPath(item: popUpIndex, section: 0)
+        currentlySelectedActivity = nil
         isSubselecting = false
+        activitySelected?(nil)
         rollBackTo?(popUpIndexPath)
     }
     
     private func addClicked() {
-        
+        print("going to add screen")
+        addPressed?()
     }
     
     private func processSubselectingClick(at indexPath: IndexPath) {
@@ -227,7 +239,24 @@ class ActivityPickerViewModel: ActivityPickerViewModelType {
     }
     
     private func processUpperLevelClick(at indexPath: IndexPath) {
+        guard indexPath.item != 0 else { // add clicked, process
+            addClicked()
+            return
+        }
+        let adjustedItemIndex = indexPath.item - 1
+        let itemForIndex = rootActivities[adjustedItemIndex]
+        currentlySelectedActivity = itemForIndex
+        activitySelected?(currentlySelectedActivity)
+        let itemChildActivites = childrenOf(activity: itemForIndex)
         
-    }
+        guard !itemChildActivites.isEmpty else {
+            print("no child items to display - default selection")
+            return
+        }
+        
+        selectedRootActivity = itemForIndex
+        isSubselecting = true
+        currentActivities = itemChildActivites
 
+    }
 }
